@@ -1,0 +1,17 @@
+.home-container {
+    height: 100vh;
+    margin-top: 80px;
+}
+
+.btn-box span {
+    padding: 21px;
+    background-color: rgb(7, 133, 7);
+    color: white;
+    border-radius: 5px;
+        cursor: pointer;
+}
+.btn-box span:focus:before {
+    transform: scale(2);
+    transition: all 0.4s linear;
+    opacity: 0;
+}

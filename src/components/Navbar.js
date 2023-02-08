@@ -3,7 +3,7 @@ import { menu } from "../services/LinkMapp";
 
 const Navbar = () => {
   return (
-    <div className="navbar-container">
+    <div className="navbar-container" style={{ marginBottom: 231 }}>
       <nav class="navbar">
         <div class="navbar-container container">
           <div class="hamburger-lines">
