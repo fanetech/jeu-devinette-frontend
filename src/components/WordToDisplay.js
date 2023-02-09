@@ -1,8 +1,8 @@
 import React from 'react';
-
+import './Components-styles/letterToDisplay.css'
 const WordToDisplay = ({letter}) => {
     return (
-        <div>
+        <div className='letter-container'>
             {letter}
         </div>
     );
