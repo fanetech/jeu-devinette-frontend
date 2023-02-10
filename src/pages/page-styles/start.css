@@ -10,3 +10,6 @@
     background: gray;
     color: white !important;
 }
+.backspace-custum{
+    cursor: pointer;
+}

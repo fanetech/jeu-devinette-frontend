@@ -7,6 +7,15 @@ const add = (payload) => {
   return BasicUrl.post(`/users`, d);
 };
 
+const update = (id, payload) => {
+  const d = {
+    mark: payload,
+  };
+  return BasicUrl.put(`/users/${id}`, d);
+};
+
+
 export const apiService = {
   add,
+  update,
 };
