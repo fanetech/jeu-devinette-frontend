@@ -14,8 +14,13 @@ const update = (id, payload) => {
   return BasicUrl.put(`/users/${id}`, d);
 };
 
+const getAll = () => {
+  return BasicUrl.get(`/users`);
+};
+
 
 export const apiService = {
   add,
   update,
+  getAll,
 };

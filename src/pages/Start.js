@@ -12,15 +12,16 @@ const Start = () => {
   const [gessWord, setGessWord] = useState("");
   const [trueWord, setTrueWord] = useState("");
   const [wordToDisplay, setWordToDisplay] = useState("");
-  const [wordToDisplayBackup, setWordToDisplayBackup] = useState("");
   const [wordLength, setWordLength] = useState(0);
-  const [message, setmessage] = useState("");
+  const [message, setmessage] = useState({value: '', style: ''});
   const [partStatus, setpartStatus] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [mark, setMark] = useState(10);
   const [tryNumber, setTryNumber] = useState(1);
   const [user, setUser] = useState(null);
   const [userCreateMessage, setUserCreateMessage] = useState("");
+  const [wordRoDisplayBackup, setWordRoDisplayBackup] = useState("");
+
 
   useEffect(() => {
     randomWord();
@@ -33,20 +34,16 @@ const Start = () => {
     word = word.toUpperCase();
     console.log(word);
     setGessWord("");
-    setmessage("");
+    setmessage({ value: "", style: "" });
     setError(false);
     setTrueWord(word);
     setWordLength(word.length);
     console.log("word", word);
     const wordArray = word.split("");
     const shuffledArray = wordArray.sort(() => Math.random() - 0.5);
-    console.log(shuffledArray);
+    setWordRoDisplayBackup(shuffledArray.join(" ").replace(/\s/g, ''));
     setWordToDisplay(shuffledArray);
-    setWordToDisplayBackup(shuffledArray);
   };
-  console.log(wordToDisplayBackup)
-  console.log("wordToDisplay",wordToDisplay);
-
   const takeLetter = (value, index) => {
     let _tryNumber
     removeWordToDisplayLetter(index)
@@ -60,7 +57,11 @@ const Start = () => {
      setTryNumber(_tryNumber);
       const _mark = mark;
       if (newgessWord === trueWord) {
-        setmessage("Bravo! Vous avez gagne...");
+        setmessage({
+          value: "Bravo! Vous avez gagne...",
+          style: "text-success",
+        });
+       
         setpartStatus(true);
         setError(true);
         updateUserInfo(_mark);
@@ -68,7 +69,10 @@ const Start = () => {
         if (_tryNumber < 6) setMark(mark - 2);
         setpartStatus(false);
         setError(true);
-        setmessage("Désolé! Vous avez perdu");
+         setmessage({
+           value: "Désolé! Vous avez perdu",
+           style: "text-danger",
+         });
       }
     }
   };
@@ -84,11 +88,8 @@ const Start = () => {
   };
 
   const handledBackspace = () => {
-    console.log("wordToDisplayBackup", wordToDisplayBackup);
     const gessWordLetter = gessWord[gessWord.length - 1];
-    console.log("gessWordLetter", gessWordLetter);
-    const wordToDisplayIndex = wordToDisplayBackup.indexOf(gessWordLetter);
-    console.log(wordToDisplayIndex);
+    const wordToDisplayIndex = wordRoDisplayBackup.indexOf(gessWordLetter);
     if (gessWord.length !== 0) {
       setGessWord(gessWord.slice(0, gessWord.length - 1));
       wordToDisplay.splice(wordToDisplayIndex, 0, gessWordLetter);
@@ -127,6 +128,7 @@ const Start = () => {
         console.log("api add error", err);
       });
   };
+
 
   return (
     <div className="start-container container">
@@ -177,17 +179,17 @@ const Start = () => {
       />
 
       <div className="d-flex justify-content-center mt-5">
-        {!message &&
+        {!message.value &&
           wordToDisplay &&
           wordToDisplay.map((letter, index) => (
             <div key={index} onClick={() => takeLetter(letter, index)}>
               <WordToDisplay letter={letter} />
             </div>
           ))}
-        {message && (
+        {message.value && (
           <>
             <div>
-              <div>{message}</div>
+              <div className={`h1 ${message.style}`}>{message.value}</div>
               <button className="btn btn-primary mt-3" onClick={runAgain}>
                 Reprendre
               </button>
