@@ -1,11 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import OtpInput from "react18-input-otp";
 import "./page-styles/start.css";
 import WordToDisplay from "../components/WordToDisplay";
 import { generateSlug } from "random-word-slugs-fr";
 import AppModal from "../components/AppModal";
 import { apiService } from "../services/api.service";
-import backspaceIcon from '../assets/img/backspace.png'
+import backspaceIcon from "../assets/img/backspace.png";
 
 const Start = () => {
   const [error, setError] = useState(false);
@@ -13,7 +13,7 @@ const Start = () => {
   const [trueWord, setTrueWord] = useState("");
   const [wordToDisplay, setWordToDisplay] = useState("");
   const [wordLength, setWordLength] = useState(0);
-  const [message, setmessage] = useState({value: '', style: ''});
+  const [message, setmessage] = useState({ value: "", style: "" });
   const [partStatus, setpartStatus] = useState(null);
   const [showModal, setShowModal] = useState(false);
   const [mark, setMark] = useState(10);
@@ -21,11 +21,15 @@ const Start = () => {
   const [user, setUser] = useState(null);
   const [userCreateMessage, setUserCreateMessage] = useState("");
   const [wordRoDisplayBackup, setWordRoDisplayBackup] = useState("");
-
+  const [wordRoDisplayHistory, setWordRoDisplayHistory] = useState([]);
+  const flag = useRef(false);
 
   useEffect(() => {
-    randomWord();
-    setShowModal(true);
+    if (flag.current === false) {
+      randomWord();
+      setShowModal(true);
+    }
+    return () => (flag.current = true);
   }, []);
 
   const randomWord = () => {
@@ -41,27 +45,32 @@ const Start = () => {
     console.log("word", word);
     const wordArray = word.split("");
     const shuffledArray = wordArray.sort(() => Math.random() - 0.5);
-    setWordRoDisplayBackup(shuffledArray.join(" ").replace(/\s/g, ''));
+    setWordRoDisplayBackup(shuffledArray.join(" ").replace(/\s/g, ""));
     setWordToDisplay(shuffledArray);
+    setWordRoDisplayHistory((prev) => [
+      ...prev,
+      shuffledArray.join(" ").replace(/\s/g, ""),
+    ]);
   };
+
   const takeLetter = (value, index) => {
-    let _tryNumber
-    removeWordToDisplayLetter(index)
+    let _tryNumber;
+    removeWordToDisplayLetter(index);
     setError(false);
     const oldgessWord = gessWord;
     const newgessWord = oldgessWord + value;
     setGessWord(newgessWord);
     if (newgessWord.length === wordLength) {
-      console.log(tryNumber)
-      _tryNumber = tryNumber + 1
-     setTryNumber(_tryNumber);
+      console.log(tryNumber);
+      _tryNumber = tryNumber + 1;
+      setTryNumber(_tryNumber);
       const _mark = mark;
       if (newgessWord === trueWord) {
         setmessage({
           value: "Bravo! Vous avez gagne...",
           style: "text-success",
         });
-       
+
         setpartStatus(true);
         setError(true);
         updateUserInfo(_mark);
@@ -69,10 +78,10 @@ const Start = () => {
         if (_tryNumber < 6) setMark(mark - 2);
         setpartStatus(false);
         setError(true);
-         setmessage({
-           value: "Désolé! Vous avez perdu",
-           style: "text-danger",
-         });
+        setmessage({
+          value: "Désolé! Vous avez perdu",
+          style: "text-danger",
+        });
       }
     }
   };
@@ -80,19 +89,29 @@ const Start = () => {
   const removeWordToDisplayLetter = (index) => {
     const _wordToDisplay = wordToDisplay;
     _wordToDisplay.splice(index, 1);
+    setWordRoDisplayHistory((prev) => [
+      ...prev,
+      _wordToDisplay.join(" ").replace(/\s/g, ""),
+    ]);
     setWordToDisplay(_wordToDisplay);
-  }
+  };
 
   const runAgain = () => {
     randomWord();
   };
 
   const handledBackspace = () => {
-    const gessWordLetter = gessWord[gessWord.length - 1];
-    const wordToDisplayIndex = wordRoDisplayBackup.indexOf(gessWordLetter);
-    if (gessWord.length !== 0) {
+    if (wordRoDisplayHistory.length !== 0) {
+      const index = wordRoDisplayHistory.length - 2
+      const wordString = wordRoDisplayHistory[index];
+      const wObject = wordString.split("");
+      console.log(wordString);
+      console.log("wObject", wObject);
+      setWordToDisplay(wObject);
       setGessWord(gessWord.slice(0, gessWord.length - 1));
-      wordToDisplay.splice(wordToDisplayIndex, 0, gessWordLetter);
+      const _w = wordRoDisplayHistory.splice(index, 1);
+      _w.splice(_w.length - 1, 1);
+      console.log("wordRoDisplayHistory", wordRoDisplayHistory);
     }
   };
 
@@ -129,7 +148,6 @@ const Start = () => {
       });
   };
 
-
   return (
     <div className="start-container container">
       {userCreateMessage && (
@@ -161,7 +179,10 @@ const Start = () => {
           Point <span class="badge badge-light"> {mark} </span>
         </button>
       </div>
-      <div className="d-flex justify-content-end backspace-custum" onClick={handledBackspace}>
+      <div
+        className="d-flex justify-content-end backspace-custum"
+        onClick={handledBackspace}
+      >
         <img width={50} height={50} src={backspaceIcon} alt="retour" />
       </div>
       <OtpInput
