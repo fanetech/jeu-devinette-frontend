@@ -12,6 +12,7 @@ const Start = () => {
   const [gessWord, setGessWord] = useState("");
   const [trueWord, setTrueWord] = useState("");
   const [wordToDisplay, setWordToDisplay] = useState("");
+  const [previosWordToDisplay, setPreviosWordToDisplay] = useState("");
   const [wordLength, setWordLength] = useState(0);
   const [message, setmessage] = useState({ value: "", style: "" });
   const [partStatus, setpartStatus] = useState(null);
@@ -20,7 +21,6 @@ const Start = () => {
   const [tryNumber, setTryNumber] = useState(1);
   const [user, setUser] = useState(null);
   const [userCreateMessage, setUserCreateMessage] = useState("");
-  const [wordRoDisplayBackup, setWordRoDisplayBackup] = useState("");
   const [wordRoDisplayHistory, setWordRoDisplayHistory] = useState([]);
   const flag = useRef(false);
 
@@ -45,17 +45,14 @@ const Start = () => {
     console.log("word", word);
     const wordArray = word.split("");
     const shuffledArray = wordArray.sort(() => Math.random() - 0.5);
-    setWordRoDisplayBackup(shuffledArray.join(" ").replace(/\s/g, ""));
     setWordToDisplay(shuffledArray);
-    setWordRoDisplayHistory((prev) => [
-      ...prev,
-      shuffledArray.join(" ").replace(/\s/g, ""),
-    ]);
+    setPreviosWordToDisplay(shuffledArray.join(" ").replace(/\s/g, ""));
   };
 
-  const takeLetter = (value, index) => {
+
+  const takeLetter = (value, index, wtd) => {
     let _tryNumber;
-    removeWordToDisplayLetter(index);
+    removeWordToDisplayLetter(index, wtd);
     setError(false);
     const oldgessWord = gessWord;
     const newgessWord = oldgessWord + value;
@@ -70,7 +67,6 @@ const Start = () => {
           value: "Bravo! Vous avez gagne...",
           style: "text-success",
         });
-
         setpartStatus(true);
         setError(true);
         updateUserInfo(_mark);
@@ -86,32 +82,39 @@ const Start = () => {
     }
   };
 
-  const removeWordToDisplayLetter = (index) => {
+  const removeWordToDisplayLetter = (index, wtd) => {
+    const w = wtd.join(" ").replace(/\s/g, "")
     const _wordToDisplay = wordToDisplay;
-    _wordToDisplay.splice(index, 1);
     setWordRoDisplayHistory((prev) => [
       ...prev,
-      _wordToDisplay.join(" ").replace(/\s/g, ""),
+      w,
     ]);
+    _wordToDisplay.splice(index, 1);
     setWordToDisplay(_wordToDisplay);
   };
 
   const runAgain = () => {
+    setUserCreateMessage('')
     randomWord();
+    setWordRoDisplayHistory([]);
   };
+
+  const runPreviosRandomWord = () => {
+      setUserCreateMessage("");
+      setWordToDisplay(previosWordToDisplay.split(""));
+      setmessage({ value: "", style: "" });
+      setGessWord("");
+      setWordRoDisplayHistory([]);
+    };
 
   const handledBackspace = () => {
     if (wordRoDisplayHistory.length !== 0) {
-      const index = wordRoDisplayHistory.length - 2
+      const index = wordRoDisplayHistory.length - 1
       const wordString = wordRoDisplayHistory[index];
       const wObject = wordString.split("");
-      console.log(wordString);
-      console.log("wObject", wObject);
       setWordToDisplay(wObject);
       setGessWord(gessWord.slice(0, gessWord.length - 1));
-      const _w = wordRoDisplayHistory.splice(index, 1);
-      _w.splice(_w.length - 1, 1);
-      console.log("wordRoDisplayHistory", wordRoDisplayHistory);
+      wordRoDisplayHistory.splice(index, 1);
     }
   };
 
@@ -157,15 +160,16 @@ const Start = () => {
       )}
       <div className="row">
         <div class="col-4">
+          <h4 className="text-secondary primary-color">Information du joueur</h4>
           <ul class="list-group">
-            <li class="list-group-item d-flex justify-content-between align-items-center">
+            <li class="list-group-item d-flex justify-content-between align-items-center fw-bold">
               Pseudo
-              <span class="badge badge-primary badge-pill text-secondary">
+              <span class="badge badge-primary badge-pill text-secondary ">
                 {user?.pseudo}
               </span>
             </li>
-            <li class="list-group-item d-flex justify-content-between align-items-center">
-              points Total
+            <li class="list-group-item d-flex justify-content-between align-items-center fw-bold">
+              Score
               <span class="badge badge-primary badge-pill bg-primary">
                 {user?.mark}
               </span>
@@ -199,11 +203,14 @@ const Start = () => {
         inputStyle="form-control mx-2"
       />
 
-      <div className="d-flex justify-content-center mt-5">
+      <div className="d-flex justify-content-center mt-5 mb-5">
         {!message.value &&
           wordToDisplay &&
           wordToDisplay.map((letter, index) => (
-            <div key={index} onClick={() => takeLetter(letter, index)}>
+            <div
+              key={index}
+              onClick={() => takeLetter(letter, index, wordToDisplay)}
+            >
               <WordToDisplay letter={letter} />
             </div>
           ))}
@@ -211,8 +218,17 @@ const Start = () => {
           <>
             <div>
               <div className={`h1 ${message.style}`}>{message.value}</div>
-              <button className="btn btn-primary mt-3" onClick={runAgain}>
+              <button
+                className="btn btn-outline-secondary mt-3 me-2 py-3 px-4"
+                onClick={runPreviosRandomWord}
+              >
                 Reprendre
+              </button>
+              <button
+                className="btn btn-primary mt-3 ms-3 py-3 px-3"
+                onClick={runAgain}
+              >
+                Recommencer
               </button>
             </div>
           </>

@@ -1,11 +1,11 @@
 import './App.css';
-import Navbar from './components/Navbar';
+import FixNav from './components/FixNav';
 import Router from './components/Router';
 
 function App() {
   return (
     <div className="App">
-      <Navbar />
+      <FixNav />
       <Router />
     </div>
   );

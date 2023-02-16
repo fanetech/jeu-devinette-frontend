@@ -10,6 +10,11 @@
     background: gray;
     color: white !important;
 }
-.backspace-custum{
+
+.backspace-custum {
     cursor: pointer;
+}
+
+.primary-color {
+    color: #117964
 }

@@ -1,7 +1,7 @@
 import React from "react";
 import { menu } from "../services/LinkMapp";
 
-const Navbar = () => {
+const FixNav = () => {
   return (
     <div className="navbar-container" style={{ marginBottom: "30px" }}>
       <nav class="navbar">
@@ -18,11 +18,11 @@ const Navbar = () => {
               </li>
             ))}
           </ul>
-          <h1 class="logo">Fane Game</h1>
+          <h1 class="logo primary-color">Fane Game</h1>
         </div>
       </nav>
     </div>
   );
 };
 
-export default Navbar;
+export default FixNav;
