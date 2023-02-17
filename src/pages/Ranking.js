@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { apiService } from "../services/api.service";
 import './page-styles/ranking.css'
+import { utils } from "../services/utils";
 
 const Ranking = () => {
   const [data, setData] = useState([]);
@@ -13,7 +14,8 @@ const Ranking = () => {
   const getAllUser = () => {
     apiService
       .getAll()
-        .then((res) => {
+      .then((res) => {
+          console.log(res?.data?.users);
             setData(res?.data?.users);
       })
       .catch((err) => {
@@ -23,7 +25,7 @@ const Ranking = () => {
 
   return (
     <div className="ranking-container container">
-      <h1 className="fw-bold primary-color">Classement</h1>
+      <h1 className="fw-bold primary-color my-5">Classement des joueurs</h1>
       <table class="table table-striped">
         <thead>
           <tr>
@@ -41,7 +43,7 @@ const Ranking = () => {
                   <th scope="row">{user?.id}</th>
                   <td>{user?.pseudo}</td>
                   <td>{user?.mark}</td>
-                  <td>{user?.createdAt}</td>
+                  <td>{ utils.getDate(user?.createdAt) }</td>
                 </tr>
               );
             })}

@@ -17,6 +17,7 @@ const Start = () => {
   const [message, setmessage] = useState({ value: "", style: "" });
   const [partStatus, setpartStatus] = useState(null);
   const [showModal, setShowModal] = useState(false);
+  const [win, setWin] = useState(false);
   const [mark, setMark] = useState(10);
   const [tryNumber, setTryNumber] = useState(1);
   const [user, setUser] = useState(null);
@@ -33,6 +34,7 @@ const Start = () => {
   }, []);
 
   const randomWord = () => {
+    setTryNumber(1);
     const slug = generateSlug(1, { format: "title" });
     let word = slug;
     word = word.toUpperCase();
@@ -51,6 +53,7 @@ const Start = () => {
 
 
   const takeLetter = (value, index, wtd) => {
+    setWin(false);
     let _tryNumber;
     removeWordToDisplayLetter(index, wtd);
     setError(false);
@@ -67,11 +70,13 @@ const Start = () => {
           value: "Bravo! Vous avez gagne...",
           style: "text-success",
         });
+        setWin(true)
         setpartStatus(true);
         setError(true);
         updateUserInfo(_mark);
       } else {
         if (_tryNumber < 6) setMark(mark - 2);
+
         setpartStatus(false);
         setError(true);
         setmessage({
@@ -218,12 +223,14 @@ const Start = () => {
           <>
             <div>
               <div className={`h1 ${message.style}`}>{message.value}</div>
+              {!win && (
               <button
                 className="btn btn-outline-secondary mt-3 me-2 py-3 px-4"
                 onClick={runPreviosRandomWord}
               >
                 Reprendre
               </button>
+              )}
               <button
                 className="btn btn-primary mt-3 ms-3 py-3 px-3"
                 onClick={runAgain}
